@@ -27,3 +27,9 @@
 *.exe
 *.out
 *.app
+
+# Server
+server/credentials/*.json
+server/vendor
+server/composer.phar
+server/config/config.php

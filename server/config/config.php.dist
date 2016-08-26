@@ -1,0 +1,10 @@
+<?php
+return [
+    'application_name' => 'Get a Room',
+    'client_secret_path' => __DIR__ . '/../credentials/google_api_client_secret.json',
+    'credentials_path' => __DIR__ . '/../credentials/calendar_credentials.json',
+    'calendars' => [
+        'salle_reunion' => 'CALENDAR_ID',
+        'bureau_passage' => 'CALENDAR_ID',
+    ]
+];
