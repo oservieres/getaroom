@@ -13,7 +13,7 @@ define('SCOPES', implode(' ', array(
 
 $credentialsPath = $config['credentials_path'];
 
-$client = new Google_Client();
+$client = new Google_Client(['prompt' => 'consent']);
 $client->setApplicationName($config['application_name']);
 $client->setScopes(SCOPES);
 $client->setAuthConfig($config['client_secret_path']);
