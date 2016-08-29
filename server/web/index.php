@@ -91,5 +91,25 @@ if (count($results->getItems()) > 0) {
 }
 
 header("HTTP/1.1 200 OK");
-header('Content-Type: application/json');
-echo json_encode($data);
+header('Content-Type: Content-type: application/xml');
+$xml = <<<XML
+<?xml version='1.0' standalone='yes'?>
+<meetings>
+    <current></current>
+    <next></next>
+</meetings>
+XML;
+$xmlElement = new \SimpleXMLElement($xml);
+
+if ($data['current'] !== null) {
+    foreach ($data['current'] as $key => $value) {
+        $xmlElement->current->addChild($key, $value);
+    }
+}
+if ($data['next'] !== null) {
+    foreach ($data['next'] as $key => $value) {
+        $xmlElement->next->addChild($key, $value);
+    }
+}
+
+echo $xmlElement->asXML();
