@@ -1,7 +1,10 @@
 #include "inkview.h"
-#include "curl/curl.h"
 #include <math.h>
 #include <algorithm>
+#include <libxml/tree.h>
+#include <libxml/parser.h>
+#include <libxml/xpath.h>
+#include <libxml/xpathInternals.h>
 
 static const int kFontSize = 42;
 
@@ -27,6 +30,13 @@ static int main_handler(int event_type, int param_one, int param_two)
         ifont *font = OpenFont("LiberationSans", kFontSize, 0);
 
         char *data = get_data();
+        xmlDocPtr doc = xmlParseDoc(BAD_CAST data);
+        xmlXPathContextPtr xpathCtx = xmlXPathNewContext(doc);
+
+        xmlXPathObjectPtr xpathObj = xmlXPathEvalExpression(BAD_CAST"/meetings/next", xpathCtx);
+        xmlNodeSetPtr nodes = xpathObj->nodesetval;
+        xmlChar* content = xmlNodeGetContent(nodes->nodeTab[0]);
+        int size = (nodes) ? nodes->nodeNr : 0;
 
         // Effacement de l'écran
         ClearScreen();
@@ -37,7 +47,9 @@ static int main_handler(int event_type, int param_one, int param_two)
         DrawLine(0, ScreenHeight() - 25, ScreenWidth(), ScreenHeight() - 25, 0x00666666);
         FillArea(50, 250, ScreenWidth() - 50*2, ScreenHeight() - 250*2, 0x00E0E0E0);
         FillArea(100, 300, ScreenWidth() - 100*2, ScreenHeight() - 300*2, 0x00A0A0A0);
-        DrawTextRect(0, ScreenHeight()/2 - kFontSize/2, ScreenWidth(), kFontSize, data, ALIGN_CENTER);
+        if (size > 0) {
+            DrawTextRect(0, ScreenHeight()/2 - kFontSize/2, ScreenWidth(), kFontSize, (char * ) content, ALIGN_CENTER);
+        }
 
         // Copie du buffer vers l'écran
         FullUpdate();
