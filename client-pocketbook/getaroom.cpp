@@ -33,23 +33,30 @@ static int main_handler(int event_type, int param_one, int param_two)
         xmlDocPtr doc = xmlParseDoc(BAD_CAST data);
         xmlXPathContextPtr xpathCtx = xmlXPathNewContext(doc);
 
-        xmlXPathObjectPtr xpathObj = xmlXPathEvalExpression(BAD_CAST"/meetings/next", xpathCtx);
-        xmlNodeSetPtr nodes = xpathObj->nodesetval;
-        xmlChar* content = xmlNodeGetContent(nodes->nodeTab[0]);
-        int size = (nodes) ? nodes->nodeNr : 0;
-
-        // Effacement de l'écran
         ClearScreen();
-
-        // Affichages sur un buffer
         SetFont(font, BLACK);
-        DrawLine(0, 25, ScreenWidth(), 25, 0x00333333);
-        DrawLine(0, ScreenHeight() - 25, ScreenWidth(), ScreenHeight() - 25, 0x00666666);
-        FillArea(50, 250, ScreenWidth() - 50*2, ScreenHeight() - 250*2, 0x00E0E0E0);
-        FillArea(100, 300, ScreenWidth() - 100*2, ScreenHeight() - 300*2, 0x00A0A0A0);
-        if (size > 0) {
-            DrawTextRect(0, ScreenHeight()/2 - kFontSize/2, ScreenWidth(), kFontSize, (char * ) content, ALIGN_CENTER);
-        }
+
+        xmlXPathObjectPtr xpathObj = xmlXPathEvalExpression(BAD_CAST"/meetings/current", xpathCtx);
+        xmlNodeSetPtr nodes = xpathObj->nodesetval;
+        char* content = (char * ) xmlNodeGetContent(nodes->nodeTab[0]);
+        int size = (nodes) ? nodes->nodeNr : 0;
+        FillArea(30, 30, ScreenWidth() - 30*2, ScreenHeight() / 2 - 15, 0x00A0A0A0);
+        DrawTextRect(
+            30, 30, ScreenWidth() - 30*2, ScreenHeight() / 2 - 15,
+            size > 0 ? content : "La salle est libre",
+            ALIGN_CENTER
+        );
+
+        xpathObj = xmlXPathEvalExpression(BAD_CAST"/meetings/next", xpathCtx);
+        nodes = xpathObj->nodesetval;
+        content = (char * ) xmlNodeGetContent(nodes->nodeTab[0]);
+        size = (nodes) ? nodes->nodeNr : 0;
+        FillArea(30, ScreenHeight() / 2 + 30, ScreenWidth() - 30*2, ScreenHeight() / 2 - 2*30, 0x00E0E0E0);
+        DrawTextRect(
+            30, ScreenHeight() / 2 + 30, ScreenWidth() - 30*2, ScreenHeight() / 2 - 2*30,
+            size > 0 ? content : "Rien à venir",
+            ALIGN_CENTER
+        );
 
         // Copie du buffer vers l'écran
         FullUpdate();
