@@ -37,27 +37,71 @@ static void update_screen()
     SetFont(font, BLACK);
     ClearScreen();
 
-    xmlXPathObjectPtr xpathObj = xmlXPathEvalExpression(BAD_CAST"/meetings/current", xpathCtx);
-    xmlNodeSetPtr nodes = xpathObj->nodesetval;
-    char* content = (char * ) xmlNodeGetContent(nodes->nodeTab[0]);
-    int size = (nodes) ? nodes->nodeNr : 0;
+    // Current
     FillArea(30, 30, ScreenWidth() - 30*2, ScreenHeight() / 2 - 15, 0x00A0A0A0);
-    DrawTextRect(
-        30, 30, ScreenWidth() - 30*2, ScreenHeight() / 2 - 15,
-        size > 0 ? content : "La salle est libre",
-        ALIGN_CENTER
-    );
+    xmlXPathObjectPtr xpathObj = xmlXPathEvalExpression(BAD_CAST"/meetings/current", xpathCtx);
+    xmlNodeSetPtr nodeSet = xpathObj->nodesetval;
+    xmlNodePtr node = nodeSet->nodeTab[0];
+    if (node->xmlChildrenNode == NULL) {
+        DrawTextRect(
+            30, ScreenHeight() / 4, ScreenWidth() - 30*2, ScreenHeight() / 2 - 15,
+            "La salle est libre",
+            ALIGN_CENTER
+        );
+    } else {
+        xmlNodePtr summary = xmlFirstElementChild(node);
+        xmlNodePtr creator = summary->next;
+        xmlNodePtr date_start = creator->next;
+        xmlNodePtr date_end = date_start->next;
+        DrawTextRect(
+            30, 30, ScreenWidth() - 30*2, ScreenHeight() / 2 - 15,
+            (char *) xmlNodeGetContent(summary),
+            ALIGN_CENTER
+        );
+        DrawTextRect(
+            30, 30 + 50, ScreenWidth() - 30*2, ScreenHeight() / 2 - 15,
+            (char *) xmlNodeGetContent(creator),
+            ALIGN_CENTER
+        );
+        DrawTextRect(
+            30, 30 + 110, ScreenWidth() - 30*2, ScreenHeight() / 2 - 15,
+            (char *) xmlNodeGetContent(date_end),
+            ALIGN_CENTER
+        );
+    }
 
-    xpathObj = xmlXPathEvalExpression(BAD_CAST"/meetings/next", xpathCtx);
-    nodes = xpathObj->nodesetval;
-    content = (char * ) xmlNodeGetContent(nodes->nodeTab[0]);
-    size = (nodes) ? nodes->nodeNr : 0;
+    // Next
     FillArea(30, ScreenHeight() / 2 + 30, ScreenWidth() - 30*2, ScreenHeight() / 2 - 2*30, 0x00E0E0E0);
-    DrawTextRect(
-        30, ScreenHeight() / 2 + 30, ScreenWidth() - 30*2, ScreenHeight() / 2 - 2*30,
-        size > 0 ? content : "Rien à venir",
-        ALIGN_CENTER
-    );
+    xpathObj = xmlXPathEvalExpression(BAD_CAST"/meetings/next", xpathCtx);
+    nodeSet = xpathObj->nodesetval;
+    node = nodeSet->nodeTab[0];
+    if (node->xmlChildrenNode == NULL) {
+        DrawTextRect(
+            30, ScreenHeight() / 2 + ScreenHeight() / 4, ScreenWidth() - 30*2, ScreenHeight() / 2 - 15,
+            "Rien de prévu !",
+            ALIGN_CENTER
+        );
+    } else {
+        xmlNodePtr summary = xmlFirstElementChild(node);
+        xmlNodePtr creator = summary->next;
+        xmlNodePtr date_start = creator->next;
+        xmlNodePtr date_end = date_start->next;
+        DrawTextRect(
+            30, ScreenHeight() / 2 + 30, ScreenWidth() - 30*2, ScreenHeight() / 2 - 15,
+            (char *) xmlNodeGetContent(summary),
+            ALIGN_CENTER
+        );
+        DrawTextRect(
+            30, ScreenHeight() / 2 + 30 + 50, ScreenWidth() - 30*2, ScreenHeight() / 2 - 15,
+            (char *) xmlNodeGetContent(creator),
+            ALIGN_CENTER
+        );
+        DrawTextRect(
+            30, ScreenHeight() / 2 + 30 + 110, ScreenWidth() - 30*2, ScreenHeight() / 2 - 15,
+            (char *) xmlNodeGetContent(date_end),
+            ALIGN_CENTER
+        );
+    }
 
     FullUpdate();
 
