@@ -18,7 +18,7 @@ $client->setApplicationName($config['application_name']);
 $client->setScopes(SCOPES);
 $client->setAuthConfig($config['client_secret_path']);
 $client->setAccessType('offline');
-$client->setApprovalPrompt('consent');
+$client->setApprovalPrompt('force');
 $client->setRedirectUri("urn:ietf:wg:oauth:2.0:oob");
 
 // Get previously generated Access Token
@@ -34,8 +34,11 @@ if (file_exists($credentialsPath)) {
 
 // Refresh the token if it's expired.
 if ($client->isAccessTokenExpired()) {
-    $client->fetchAccessTokenWithRefreshToken($client->getRefreshToken());
-    file_put_contents($credentialsPath, json_encode($client->getAccessToken()));
+    $refreshToken = $client->getRefreshToken();
+    $client->fetchAccessTokenWithRefreshToken($refreshToken);
+    $content = $client->getAccessToken();
+    $content['refresh_token'] = $refreshToken;
+    file_put_contents($credentialsPath, json_encode($content));
 }
 
 $service = new Google_Service_Calendar($client);
