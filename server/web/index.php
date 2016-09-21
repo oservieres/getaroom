@@ -18,6 +18,7 @@ $client->setApplicationName($config['application_name']);
 $client->setScopes(SCOPES);
 $client->setAuthConfig($config['client_secret_path']);
 $client->setAccessType('offline');
+$client->setApprovalPrompt('consent');
 $client->setRedirectUri("urn:ietf:wg:oauth:2.0:oob");
 
 // Get previously generated Access Token
