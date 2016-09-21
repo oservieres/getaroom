@@ -98,7 +98,7 @@ static void update_screen()
         );
         DrawTextRect(
             30, ScreenHeight() / 2 + 30 + 110, ScreenWidth() - 30*2, ScreenHeight() / 2 - 15,
-            (char *) xmlNodeGetContent(date_end),
+            (char *) xmlNodeGetContent(date_start),
             ALIGN_CENTER
         );
     }
