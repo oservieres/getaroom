@@ -46,12 +46,15 @@ $service = new Google_Service_Calendar($client);
 $calendarId = 'tea-ebook.com_2d3230323430343331393935@resource.calendar.google.com';
 
 $currentDate = new \DateTimeImmutable("today", new \DateTimeZone('UTC'));
+$endDayDate = new \DateTimeImmutable("tomorrow", new \DateTimeZone('UTC'));
 $currentTime = new \DateTimeImmutable(null, new \DateTimeZone('UTC'));
 $optParams = array(
   'maxResults' => 10,
   'orderBy' => 'startTime',
   'singleEvents' => TRUE,
   'timeMin' => $currentDate->format("c"),
+  'timeMax' => $endDayDate->format("c"),
+  'timeZone' => 'Europe/Paris',
 );
 $results = $service->events->listEvents($calendarId, $optParams);
 
@@ -66,27 +69,28 @@ if (count($results->getItems()) > 0) {
     if (empty($start)) {
       $start = $event->start->date;
     }
-    $start = new \DateTimeImmutable($start, new \DateTimeZone('UTC'));
+    $start = new \DateTime($start);
+
     $end = $event->end->dateTime;
     if (empty($end)) {
       $end = $event->end->date;
     }
-    $end = new \DatetimeImmutable($end, new \DateTimeZone('UTC'));
+    $end = new \Datetime($end);
 
     $eventType = null;
     if ($start < $currentTime && $end > $currentTime) {
         $data['current'] = [
             'summary' => $event->getSummary(),
             'creator' => $event->getCreator()->getEmail(),
-            'start' => $start->format('c'),
-            'end' => $end->format('c'),
+            'start' => $start->format('H:i'),
+            'end' => $end->format('H:i'),
         ];
     } else if ($start > $currentTime) {
         $data['next'] = [
             'summary' => $event->getSummary(),
             'creator' => $event->getCreator()->getEmail(),
-            'start' => $start->format('c'),
-            'end' => $end->format('c'),
+            'start' => $start->format('H:i'),
+            'end' => $end->format('H:i'),
         ];
         break;
     }
