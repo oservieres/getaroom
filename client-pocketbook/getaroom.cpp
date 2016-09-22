@@ -42,6 +42,11 @@ static void update_screen()
     xmlXPathObjectPtr xpathObj = xmlXPathEvalExpression(BAD_CAST"/meetings/current", xpathCtx);
     xmlNodeSetPtr nodeSet = xpathObj->nodesetval;
     xmlNodePtr node = nodeSet->nodeTab[0];
+    DrawTextRect(
+        30, 30, ScreenWidth() - 30*2, ScreenHeight() / 2 - 15,
+        "MAINTENANT",
+        ALIGN_CENTER
+    );
     if (node->xmlChildrenNode == NULL) {
         DrawTextRect(
             30, ScreenHeight() / 4, ScreenWidth() - 30*2, ScreenHeight() / 2 - 15,
@@ -54,18 +59,22 @@ static void update_screen()
         xmlNodePtr date_start = creator->next;
         xmlNodePtr date_end = date_start->next;
         DrawTextRect(
-            30, 30, ScreenWidth() - 30*2, ScreenHeight() / 2 - 15,
+            30, 30 + 100, ScreenWidth() - 30*2, ScreenHeight() / 2 - 15,
             (char *) xmlNodeGetContent(summary),
             ALIGN_CENTER
         );
         DrawTextRect(
-            30, 30 + 50, ScreenWidth() - 30*2, ScreenHeight() / 2 - 15,
+            30, 30 + 250, ScreenWidth() - 30*2, ScreenHeight() / 2 - 15,
             (char *) xmlNodeGetContent(creator),
             ALIGN_CENTER
         );
+
+        char label[30];
+        strcpy(label, "Jusqu'à ");
+        strcat(label, (char *) xmlNodeGetContent(date_end));
         DrawTextRect(
-            30, 30 + 110, ScreenWidth() - 30*2, ScreenHeight() / 2 - 15,
-            (char *) xmlNodeGetContent(date_end),
+            30, 30 + 310, ScreenWidth() - 30*2, ScreenHeight() / 2 - 15,
+            label,
             ALIGN_CENTER
         );
     }
@@ -75,10 +84,15 @@ static void update_screen()
     xpathObj = xmlXPathEvalExpression(BAD_CAST"/meetings/next", xpathCtx);
     nodeSet = xpathObj->nodesetval;
     node = nodeSet->nodeTab[0];
+    DrawTextRect(
+        30, ScreenHeight() / 2 + 30, ScreenWidth() - 30*2, ScreenHeight() / 2 - 15,
+        "APRES",
+        ALIGN_CENTER
+    );
     if (node->xmlChildrenNode == NULL) {
         DrawTextRect(
             30, ScreenHeight() / 2 + ScreenHeight() / 4, ScreenWidth() - 30*2, ScreenHeight() / 2 - 15,
-            "Rien de prévu !",
+            "Rien de prévu aujourd'hui !",
             ALIGN_CENTER
         );
     } else {
@@ -87,18 +101,21 @@ static void update_screen()
         xmlNodePtr date_start = creator->next;
         xmlNodePtr date_end = date_start->next;
         DrawTextRect(
-            30, ScreenHeight() / 2 + 30, ScreenWidth() - 30*2, ScreenHeight() / 2 - 15,
+            30, ScreenHeight() / 2 + 30 + 100, ScreenWidth() - 30*2, ScreenHeight() / 2 - 15,
             (char *) xmlNodeGetContent(summary),
             ALIGN_CENTER
         );
         DrawTextRect(
-            30, ScreenHeight() / 2 + 30 + 50, ScreenWidth() - 30*2, ScreenHeight() / 2 - 15,
+            30, ScreenHeight() / 2 + 30 + 250, ScreenWidth() - 30*2, ScreenHeight() / 2 - 15,
             (char *) xmlNodeGetContent(creator),
             ALIGN_CENTER
         );
+        char label[30];
+        strcpy(label, "A partir de ");
+        strcat(label, (char *) xmlNodeGetContent(date_start));
         DrawTextRect(
-            30, ScreenHeight() / 2 + 30 + 110, ScreenWidth() - 30*2, ScreenHeight() / 2 - 15,
-            (char *) xmlNodeGetContent(date_start),
+            30, ScreenHeight() / 2 + 30 + 310, ScreenWidth() - 30*2, ScreenHeight() / 2 - 15,
+            label,
             ALIGN_CENTER
         );
     }
