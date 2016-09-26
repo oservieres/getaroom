@@ -14,7 +14,7 @@ static char* get_data()
 {
     char buffer[2048];
 
-    const char *url = "http://192.168.10.2:8001/?calendar=salle_reunion";
+    const char *url = "http://192.168.1.90:1234/web/?calendar=salle_reunion";
     int retsize;
     char *cookie = NULL;
     char *post = NULL;
