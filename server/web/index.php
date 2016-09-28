@@ -43,8 +43,6 @@ if ($client->isAccessTokenExpired()) {
 
 $service = new Google_Service_Calendar($client);
 
-$calendarId = 'tea-ebook.com_2d3230323430343331393935@resource.calendar.google.com';
-
 $currentDate = new \DateTimeImmutable("today", new \DateTimeZone('UTC'));
 $endDayDate = new \DateTimeImmutable("tomorrow", new \DateTimeZone('UTC'));
 $currentTime = new \DateTimeImmutable(null, new \DateTimeZone('UTC'));
