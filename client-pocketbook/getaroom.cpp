@@ -10,11 +10,14 @@
 
 static const int kFontSize = 42;
 
-static char* get_data()
+static char* get_data(char* calendar_name)
 {
-    char buffer[2048];
+	char buffer[2048];
 
-    const char *url = "http://192.168.1.90:1234/web/?calendar=salle_reunion";
+	char url[2048];
+    strcpy(url, "http://192.168.1.90:1234/web/?calendar=");
+    strcat(url, calendar_name);
+
     int retsize;
     char *cookie = NULL;
     char *post = NULL;
@@ -26,11 +29,11 @@ static char* get_data()
     return content;
 }
 
-static void update_screen()
+static void update_screen(void* calendar_name)
 {
     ifont *font = OpenFont("LiberationSans", kFontSize, 0);
 
-    char *data = get_data();
+    char *data = get_data((char*)calendar_name);
     xmlDocPtr doc = xmlParseDoc(BAD_CAST data);
     xmlXPathContextPtr xpathCtx = xmlXPathNewContext(doc);
 
@@ -128,22 +131,84 @@ static void update_screen()
 static void *update_screen_async(void *arg)
 {
     sleep(900);
-    update_screen();
+    update_screen(arg);
+}
+
+static void launch(char* calendar_name)
+{
+    update_screen(calendar_name);
+    pthread_t update_thread;
+    while (true) {
+        pthread_create(&update_thread, NULL, update_screen_async, calendar_name);
+        pthread_join(update_thread, NULL);
+    }
+}
+
+static void display_message(char* message)
+{
+    ClearScreen();
+    DrawTextRect(
+        30, ScreenHeight() / 2, ScreenWidth() - 30, ScreenHeight() / 2 +30,
+        message,
+        ALIGN_CENTER
+    );
+    FullUpdate();
 }
 
 static int main_handler(int event_type, int param_one, int param_two)
 {
-    if (EVT_INIT == event_type) {
-        update_screen();
-        pthread_t update_thread;
-        while (true) {
-            pthread_create(&update_thread, NULL, update_screen_async, NULL);
-            pthread_join(update_thread, NULL);
+	static int step = 0;
+
+    ifont *font = OpenFont("LiberationSans", kFontSize, 0);
+    SetFont(font, BLACK);
+	switch (event_type) {
+	case EVT_INIT:
+            display_message("Utilisez la flèche de droite pour sélectionner la salle puis appuyez sur la touche menu pour lancer le rafraichissement automatique.");
+		break;
+	case EVT_SHOW:
+
+		break;
+	case EVT_KEYPRESS:
+		if (param_one == KEY_NEXT) {
+			if (step == 0) {
+                ++step;
+                display_message("bureau_passage");
+			}
+			else if (step == 1) {
+                ++step;
+				display_message("bureau_nico");
+			}
+			else if (step == 2) {
+                step = 0;
+				display_message("salle_reunion");
+			}
+			return 1;
+		}
+		else if (param_one == KEY_MENU) {
+			if (step == 0) {
+                launch("salle_reunion");
+			}
+			else if (step == 1) {
+				launch("bureau_passage");
+			}
+			else if (step == 2) {
+				launch("bureau_nico");
+			}
+			return 1;
+		}
+        else {
+            CloseApp();
         }
-    }
-    else if (EVT_KEYPRESS == event_type) {
-        CloseApp();
-    }
+
+		break;
+	case EVT_EXIT:
+
+		break;
+	default:
+		break;
+	}
+    CloseFont(font);
+
     return 0;
 }
 
