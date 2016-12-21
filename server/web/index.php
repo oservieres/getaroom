@@ -109,12 +109,12 @@ $xmlElement = new \SimpleXMLElement($xml);
 
 if ($data['current'] !== null) {
     foreach ($data['current'] as $key => $value) {
-        $xmlElement->current->addChild($key, $value);
+        $xmlElement->current->addChild($key, htmlspecialchars($value));
     }
 }
 if ($data['next'] !== null) {
     foreach ($data['next'] as $key => $value) {
-        $xmlElement->next->addChild($key, $value);
+        $xmlElement->next->addChild($key, htmlspecialchars($value));
     }
 }
 
